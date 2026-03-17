@@ -1,5 +1,6 @@
 # 编译输出
 *.exe
+!runtime/python/3.11.9/python.exe
 output.wav
 tmp.wav
 
