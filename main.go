@@ -98,6 +98,44 @@ func InstallDeps() error {
 	fmt.Println("  安装 Python 依赖...")
 	fmt.Println("========================================")
 
+	// 先检查 pip 是否可用，不可用则用 get-pip.py 引导安装
+	checkPip := exec.Command(PythonExe, "-m", "pip", "--version")
+	if err := checkPip.Run(); err != nil {
+		fmt.Println("pip 未安装，正在引导安装...")
+
+		getPipPath := filepath.Join("runtime", "python", "get-pip.py")
+
+		// 如果 get-pip.py 不存在，从网上下载
+		if _, err := os.Stat(getPipPath); os.IsNotExist(err) {
+			fmt.Println("下载 get-pip.py...")
+			resp, err := http.Get("https://bootstrap.pypa.io/get-pip.py")
+			if err != nil {
+				return fmt.Errorf("下载 get-pip.py 失败: %w", err)
+			}
+			defer resp.Body.Close()
+
+			data, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return fmt.Errorf("读取 get-pip.py 失败: %w", err)
+			}
+
+			if err := os.MkdirAll(filepath.Dir(getPipPath), 0755); err != nil {
+				return fmt.Errorf("创建目录失败: %w", err)
+			}
+			if err := os.WriteFile(getPipPath, data, 0644); err != nil {
+				return fmt.Errorf("保存 get-pip.py 失败: %w", err)
+			}
+		}
+
+		pipInstall := exec.Command(PythonExe, getPipPath, "--target", SitePackages)
+		pipInstall.Stdout = os.Stdout
+		pipInstall.Stderr = os.Stderr
+		if err := pipInstall.Run(); err != nil {
+			return fmt.Errorf("pip 引导安装失败: %w", err)
+		}
+		fmt.Println("pip 安装成功！")
+	}
+
 	cmd := exec.Command(PythonExe, "-m", "pip", "install",
 		"--target", SitePackages,
 		"-r", Requirements,
