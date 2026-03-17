@@ -1,0 +1,17 @@
+# 编译输出
+*.exe
+output.wav
+tmp.wav
+
+# Python 第三方依赖（通过 pip install 自动安装）
+runtime/python/3.11.9/site-packages/
+
+# 模型权重文件（通过 download_maya1.py 下载）
+runtime/python/models/maya1/*.safetensors
+runtime/python/models/maya1/model.safetensors.index.json
+runtime/python/models/maya1/.cache/
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
