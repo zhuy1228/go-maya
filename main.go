@@ -127,7 +127,7 @@ func InstallDeps() error {
 			}
 		}
 
-		pipInstall := exec.Command(PythonExe, getPipPath, "--target", SitePackages)
+		pipInstall := exec.Command(PythonExe, getPipPath)
 		pipInstall.Stdout = os.Stdout
 		pipInstall.Stderr = os.Stderr
 		if err := pipInstall.Run(); err != nil {
@@ -136,10 +136,10 @@ func InstallDeps() error {
 		fmt.Println("pip 安装成功！")
 	}
 
+	fmt.Println("正在安装依赖包（可能需要几分钟）...")
 	cmd := exec.Command(PythonExe, "-m", "pip", "install",
 		"--target", SitePackages,
 		"-r", Requirements,
-		"--quiet",
 	)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
